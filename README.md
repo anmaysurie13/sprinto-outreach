@@ -2,6 +2,8 @@
 
 Educational prototype. Turns a list of company domains into a qualified prospect, a verified decision-maker and an evidence-backed personalised cold email — then sends it **only to your own test inbox**.
 
+**Live demo:** https://sprinto-outreach-iota.vercel.app
+
 > Never sends to prospects. The Gmail recipient is hard-wired to `TEST_EMAIL`; the draft still greets the real discovered person by name.
 
 ## Seven-stage workflow
@@ -71,5 +73,6 @@ npm run dev
 | 1 | Invalid domain via real API | `POST /api/companies` with `not_a_domain` | Rejected: "Missing top-level domain" |
 | 10 | Real end-to-end (Gemini via OpenRouter, Neon, Hunter.io) on one public B2B SaaS domain | Dashboard API, step-by-step | Scrape → extract → qualify → 1 research page (`/about`) → **QUALIFIED** → Hunter Tier-1 contact (Head of Security, `valid`) → 2 pain points (1 verified, 1 hypothesis) → 130-word draft with verbatim hook → **DRAFT_READY in 36 s** |
 | 10b | Real test send (Resend → own test inbox) | Requires an explicit click in the UI | Not yet run — pending approval |
+| — | Vercel production | `GET /api/health` on the live URL | All required env vars present, **database: ok** |
 
 Not verified yet: inbox delivery, Vercel production run, Gmail OAuth path (Resend is used instead).

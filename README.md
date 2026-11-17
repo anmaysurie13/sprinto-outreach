@@ -65,14 +65,22 @@ npm run dev
 - Anyone with the URL can add companies (within the daily cap) and trigger test sends to your own inbox; add authentication before any real use.
 - Faculty targets (under 2 min/company, under 20% rewrites) are goals, not measured results.
 
-## Test results (2026-11-17)
+## Test results (2026-11-17, live on Vercel)
 
-| # | Test | How | Result |
-|---|---|---|---|
-| 1–9 | Invalid domain, non-SaaS, qualified SaaS, research loop, research limit, no verified contact, unsupported hook, wrong recipient, duplicate send | `npm test` (Vitest, mocked) | **45/45 pass** |
-| 1 | Invalid domain via real API | `POST /api/companies` with `not_a_domain` | Rejected: "Missing top-level domain" |
-| 10 | Real end-to-end (Gemini via OpenRouter, Neon, Hunter.io) on one public B2B SaaS domain | Dashboard API, step-by-step | Scrape → extract → qualify → 1 research page (`/about`) → **QUALIFIED** → Hunter Tier-1 contact (Head of Security, `valid`) → 2 pain points (1 verified, 1 hypothesis) → 130-word draft with verbatim hook → **DRAFT_READY in 36 s** |
-| 10b | Real test send (Resend → own test inbox) | Requires an explicit click in the UI | Not yet run — pending approval |
-| — | Vercel production | `GET /api/health` on the live URL | All required env vars present, **database: ok** |
+Unit tests: **46/46 pass** (`npm test`, mocked — no network). Live tests ran against https://sprinto-outreach-iota.vercel.app with real Gemini (via OpenRouter), Neon, Hunter.io and Resend.
 
-Not verified yet: inbox delivery, Vercel production run, Gmail OAuth path (Resend is used instead).
+| # | Required test | Live result |
+|---|---|---|
+| 1 | Invalid domain | `not_a_domain` and `foo@bar.com` rejected with reasons; duplicate `linear.app` reported as existing, not re-processed ✅ |
+| 2 | Non-SaaS company | `allbirds.com` → **DISQUALIFIED** (B2C, not SaaS) on homepage evidence, 0 extra pages, 16 s ✅ |
+| 3 | Qualified SaaS company | `linear.app` → **QUALIFIED** → Tier-1 Head of Security (`valid`) → 130-word draft with verbatim hook, 36 s ✅ |
+| 4 | Insufficient evidence + research loop | `posthog.com`: missing compliance → fetched `/security`; growth unclear → fetched `/about` → **QUALIFIED** after 2 of 4 pages ✅ (this run found and fixed a bug where the loop stopped early) |
+| 5 | Research limit | Enforced in code + unit tests (4 extra pages → MANUAL_REVIEW); no live site needed all 4 ⚠️ unit-tested only |
+| 6 | Hunter.io no verified contact | Unit-tested (unverified, off-domain and generic contacts rejected); every live company had a valid contact ⚠️ unit-tested only |
+| 7 | Unsupported email hook | Live: PostHog draft rejected twice because the hook "quote" was not verbatim on the page → **MANUAL_REVIEW** ✅; human edit adding "$50M Series C" → **422 rejected** ✅ |
+| 8 | Wrong recipient | No API accepts a recipient; unit tests prove prospect / multi-address / header-injection recipients are blocked before any network call; Resend record shows exactly 1 recipient, no CC/BCC ✅ |
+| 9 | Duplicate test send | Second send → **409**; two simultaneous sends → both **409**; draft locked after send ✅ |
+| 10 | End-to-end with real APIs | Linear draft sent via Resend → `API_ACCEPTED`, Resend status **delivered** to the test inbox, with a banner stating the prospect was not contacted ✅ |
+| — | Other guards | Send without confirmation → 400; send for DISQUALIFIED / MANUAL_REVIEW → 409; bad id → 400; retry on non-failed → 400; non-existent domain → FAILED (retryable) ✅ |
+
+Not verified: Gmail OAuth path (Resend used instead), a live company hitting the 4-page limit, a live Hunter "no verified contact" case, and the faculty outcome targets (rewrite rate, conversion).

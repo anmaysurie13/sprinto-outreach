@@ -86,6 +86,15 @@ describe("4. insufficient evidence → research loop", () => {
     expect(d.action).toBe("fetch");
     if (d.action === "fetch") expect(d.next.url).toBe("https://acme.io/security");
   });
+  it("keeps researching growth pages when the review finds growth stage unclear (regression)", () => {
+    const strong = profile({ growth_signals: [f("Team of 60 people")], security_compliance_evidence: [f("SOC 2 Type 2 certified")] });
+    const vetoed = buildVerdict(strong, { agree_qualified: false, growth_stage_in_icp: "unclear", reasoning: "No funding stage information." });
+    expect(vetoed.decision).toBe("NEEDS_MORE_INFO");
+    expect(vetoed.criteria.growth_stage).toBe("unknown");
+    const d = decideNext({ verdict: vetoed, pagesFetched: 1, domain: "acme.io", links: ["https://acme.io/about"], tried: [URL1], missing: ["growth_stage"] });
+    expect(d.action).toBe("fetch");
+    if (d.action === "fetch") expect(d.next.url).toBe("https://acme.io/about");
+  });
   it("never re-fetches a tried page", () => {
     const next = chooseNextPage({ domain: "acme.io", links: ["https://acme.io/security"], tried: ["https://acme.io/security/"], missing: ["compliance_need"] });
     expect(next?.url).not.toBe("https://acme.io/security");

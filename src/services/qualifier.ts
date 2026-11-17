@@ -88,7 +88,14 @@ export function buildVerdict(
     reasoning: gate
       ? `Criteria have evidence but the review did not confirm a fit: ${gate.reasoning}`
       : "Criteria have evidence but no confirming review was obtained.",
-    criteria: gate?.growth_stage_in_icp === "no" ? { ...criteria, growth_stage: "unmet" } : criteria,
+    // "unclear" → growth evidence is treated as missing so the research loop looks for it (about/careers/customers);
+    // "no" → growth is out of ICP and no further page can fix that.
+    criteria:
+      gate?.growth_stage_in_icp === "no"
+        ? { ...criteria, growth_stage: "unmet" }
+        : gate?.growth_stage_in_icp === "unclear"
+          ? { ...criteria, growth_stage: "unknown" }
+          : criteria,
     evidence: facts.slice(0, 3),
   };
 }

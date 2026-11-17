@@ -41,7 +41,7 @@ export default function Pipeline() {
   return (
     <>
       <PageHeader
-        title="Prospect Pipeline"
+        title="All companies"
         description="Every company with its ICP verdict, contact and current stage."
         action={
           unfinished.length > 0 && (

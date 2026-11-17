@@ -40,6 +40,12 @@ export function useApi<T>(url: string | null, pollMs?: number) {
   }, [url, tick]);
 
   useEffect(() => {
+    const bump = () => setTick((n) => n + 1);
+    window.addEventListener("pipeline:changed", bump);
+    return () => window.removeEventListener("pipeline:changed", bump);
+  }, []);
+
+  useEffect(() => {
     if (!pollMs) return;
     const t = setInterval(() => setTick((n) => n + 1), pollMs);
     return () => clearInterval(t);

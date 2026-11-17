@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --line: #e2e8f0;
+  --ink: #0b1f3a;
+  --muted: #55657d;
+  --primary: #1d4ed8;
+  --primary-fg: #ffffff;
+  --teal: #0f766e;
+  --ring: #2563eb;
+  --ok-bg: #d9f5ee; --ok-fg: #0b5d54;
+  --warn-bg: #fdf0d0; --warn-fg: #7a4a05;
+  --bad-bg: #fde2e2; --bad-fg: #9b1c1c;
+  --info-bg: #dbe8ff; --info-fg: #1e3a8a;
+  --neutral-bg: #e8edf4; --neutral-fg: #3b4a61;
+}
+.dark {
+  --bg: #0a1424;
+  --surface: #101c30;
+  --surface-2: #14233b;
+  --line: #243653;
+  --ink: #e8eef8;
+  --muted: #9fb0c8;
+  --primary: #4f8bff;
+  --primary-fg: #06142b;
+  --teal: #2dd4bf;
+  --ring: #6aa0ff;
+  --ok-bg: #0f3b36; --ok-fg: #7ce8d4;
+  --warn-bg: #3d2d0a; --warn-fg: #f6cf7a;
+  --bad-bg: #4a1818; --bad-fg: #fca5a5;
+  --info-bg: #14305f; --info-fg: #a9c6ff;
+  --neutral-bg: #1c2b44; --neutral-fg: #b6c4da;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-teal: var(--teal);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+.tone-ok { background: var(--ok-bg); color: var(--ok-fg); }
+.tone-warn { background: var(--warn-bg); color: var(--warn-fg); }
+.tone-bad { background: var(--bad-bg); color: var(--bad-fg); }
+.tone-info { background: var(--info-bg); color: var(--info-fg); }
+.tone-neutral { background: var(--neutral-bg); color: var(--neutral-fg); }
+
+@keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--line) 25%, var(--surface-2) 50%, var(--line) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
